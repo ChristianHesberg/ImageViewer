@@ -1,8 +1,13 @@
 package dk.easv;
 
 import java.io.File;
+import java.lang.reflect.Executable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -69,5 +74,24 @@ public class ImageViewerWindowController
         {
             imageView.setImage(images.get(currentImageIndex));
         }
+    }
+
+    public void handleBtnSlideshowAction(ActionEvent actionEvent) {
+        ExecutorService exec = Executors.newSingleThreadExecutor();
+        if(!images.isEmpty())
+        {
+            Thread t = new Thread(() -> {
+                while(true) {
+                    currentImageIndex = (currentImageIndex + 1) % images.size();
+                    displayImage();
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            exec.submit(t);
+    }
     }
 }
