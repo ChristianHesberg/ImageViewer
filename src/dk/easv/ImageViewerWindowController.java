@@ -8,9 +8,13 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
@@ -19,8 +23,14 @@ import javafx.stage.Stage;
 
 public class ImageViewerWindowController
 {
+    @FXML
+    private Label fileLabel;
+    @FXML
+    private Slider speedSlider;
     private final List<Image> images = new ArrayList<>();
     private int currentImageIndex = 0;
+    private Slideshow slideshow;
+
 
     @FXML
     Parent root;
@@ -73,25 +83,26 @@ public class ImageViewerWindowController
         if (!images.isEmpty())
         {
             imageView.setImage(images.get(currentImageIndex));
+            Platform.runLater(this::setFileLabel);
         }
     }
 
+    private void setFileLabel()
+    {
+        fileLabel.setText(images.get(currentImageIndex).getUrl());
+    }
+
     public void handleBtnSlideshowAction(ActionEvent actionEvent) {
-        ExecutorService exec = Executors.newSingleThreadExecutor();
-        if(!images.isEmpty())
-        {
-            Thread t = new Thread(() -> {
-                while(true) {
-                    currentImageIndex = (currentImageIndex + 1) % images.size();
-                    displayImage();
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            exec.submit(t);
+        ExecutorService exec = Executors.newCachedThreadPool();
+        int time = (int) speedSlider.getValue();
+        slideshow = new Slideshow(images, imageView, time, fileLabel);
+        System.out.println(time);
+        exec.submit(slideshow);
+
     }
+    public void handleBtnStopSlides(ActionEvent actionEvent) {
+        slideshow.stop();
     }
+
+
 }
