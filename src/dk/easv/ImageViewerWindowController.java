@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -83,13 +84,7 @@ public class ImageViewerWindowController
         if (!images.isEmpty())
         {
             imageView.setImage(images.get(currentImageIndex));
-            Platform.runLater(this::setFileLabel);
         }
-    }
-
-    private void setFileLabel()
-    {
-        fileLabel.setText(images.get(currentImageIndex).getUrl());
     }
 
     public void handleBtnSlideshowAction(ActionEvent actionEvent) {
@@ -98,11 +93,9 @@ public class ImageViewerWindowController
         slideshow = new Slideshow(images, imageView, time, fileLabel);
         System.out.println(time);
         exec.submit(slideshow);
-
     }
+
     public void handleBtnStopSlides(ActionEvent actionEvent) {
         slideshow.stop();
     }
-
-
 }

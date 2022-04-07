@@ -1,7 +1,6 @@
 package dk.easv;
 
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -26,17 +25,17 @@ public class Slideshow implements Runnable {
     public void run() {
         if(!images.isEmpty()) {
             System.out.println(time);
-                while(running) {
-                    currentImageIndex = (currentImageIndex + 1) % images.size();
-                    imageView.setImage(images.get(currentImageIndex));
-                    try {
-                        Thread.sleep(time);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+            while(running) {
+                currentImageIndex = (currentImageIndex + 1) % images.size();
+                imageView.setImage(images.get(currentImageIndex));
+                Platform.runLater(this::setFileLabel);
+                try {
+                    Thread.sleep(time);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
+            }
         }
-
     }
 
     private void setFileLabel() {
